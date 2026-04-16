@@ -10,23 +10,10 @@ const app = express();
 
 /* ---------------- Middleware ---------------- */
 
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "http://localhost:5175",
-  process.env.FRONTEND_URL,
-  // add frontend deployed URL here later
-];
-
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("CORS not allowed"));
-      }
-    },
+    origin: ["https://the-mastergym.vercel.app", "http://localhost:5173"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   }),
 );
