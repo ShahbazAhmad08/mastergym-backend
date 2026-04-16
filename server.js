@@ -13,6 +13,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:5175",
+  process.env.FRONTEND_URL,
   // add frontend deployed URL here later
 ];
 
@@ -89,7 +90,7 @@ const startServer = async () => {
       console.log(`📍 Environment: ${process.env.NODE_ENV || "development"}`);
     });
   } catch (error) {
-    console.error("❌ Startup Error:", error.message);
+    console.error("❌ Startup Error:", error);
     process.exit(1);
   }
 };
