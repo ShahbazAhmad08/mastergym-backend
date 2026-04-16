@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const dns = require("dns");
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 /* ---------------- Routes ---------------- */
+dns.setDefaultResultOrder("ipv4first");
 
 app.use("/api/auth", require("./routes/auth"));
 app.use("/api/members", require("./routes/members"));
@@ -74,6 +76,7 @@ app.use((err, req, res, next) => {
 /* ---------------- Start Server ---------------- */
 
 const PORT = process.env.PORT || 5000;
+console.log(process.env.MONGODB_URI);
 
 const startServer = async () => {
   try {
@@ -90,7 +93,7 @@ const startServer = async () => {
       console.log(`📍 Environment: ${process.env.NODE_ENV || "development"}`);
     });
   } catch (error) {
-    console.error("❌ Startup Error:", error);
+    console.error("❌ Startup Error:", error.message);
     process.exit(1);
   }
 };
