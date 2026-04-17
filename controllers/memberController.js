@@ -131,7 +131,7 @@ exports.deleteMember = async (req, res) => {
 
 exports.renewMember = async (req, res) => {
   try {
-    const { startDate } = req.body;
+    const { startDate, membershipPlan } = req.body;
 
     const member = await Member.findById(req.params.id);
 
@@ -142,28 +142,48 @@ exports.renewMember = async (req, res) => {
       });
     }
 
-    const expiryDate = new Date(startDate);
+    // use incoming plan if provided, else existing plan
+    const plan = membershipPlan || member.membershipPlan;
 
-    if (member.membershipPlan === "Basic") {
-      expiryDate.setMonth(expiryDate.getMonth() + 1);
-    } else if (member.membershipPlan === "Premium") {
-      expiryDate.setMonth(expiryDate.getMonth() + 3);
-    } else if (member.membershipPlan === "Elite") {
-      expiryDate.setMonth(expiryDate.getMonth() + 6);
+    const allowedPlans = ["Basic", "Premium", "Elite"];
+
+    if (!allowedPlans.includes(plan)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid membership plan",
+      });
     }
 
+    const expiryDate = new Date(startDate);
+
+    if (isNaN(expiryDate.getTime())) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid start date",
+      });
+    }
+
+    const planDuration = {
+      Basic: 1,
+      Premium: 3,
+      Elite: 6,
+    };
+
+    expiryDate.setMonth(expiryDate.getMonth() + planDuration[plan]);
+
     member.startDate = startDate;
+    member.membershipPlan = plan;
     member.expiryDate = expiryDate;
     member.status = "Active";
 
     await member.save();
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       member,
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: error.message,
     });
