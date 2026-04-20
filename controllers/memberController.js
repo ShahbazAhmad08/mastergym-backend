@@ -46,16 +46,14 @@ exports.createMember = async (req, res) => {
   try {
     const { name, email, phone, startDate, membershipPlan } = req.body;
 
-    const today = new Date();
-    const expiryDate = new Date(today);
+    const planDuration = {
+      Basic: 1,
+      Premium: 3,
+      Elite: 6,
+    };
 
-    if (membershipPlan === "Basic") {
-      expiryDate.setMonth(expiryDate.getMonth() + 1);
-    } else if (membershipPlan === "Premium") {
-      expiryDate.setMonth(expiryDate.getMonth() + 3);
-    } else if (membershipPlan === "Elite") {
-      expiryDate.setMonth(expiryDate.getMonth() + 6);
-    }
+    const expiryDate = new Date(startDate);
+    expiryDate.setMonth(expiryDate.getMonth() + planDuration[membershipPlan]);
 
     const member = await Member.create({
       name,
@@ -72,7 +70,6 @@ exports.createMember = async (req, res) => {
       member,
     });
   } catch (error) {
-    // console.error("Error creating member:", error);
     res.status(500).json({
       success: false,
       message: error.message,

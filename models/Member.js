@@ -21,10 +21,7 @@ const memberSchema = new mongoose.Schema({
     enum: ["Basic", "Premium", "Elite"],
     required: true,
   },
-  joinDate: {
-    type: Date,
-    default: Date.now,
-  },
+
   expiryDate: {
     type: Date,
     required: true,
